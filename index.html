@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Lock</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #lockScreen, #audioPage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #lockScreen.active, #audioPage.active {
+            display: flex;
+        }
+        .lock {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .digits {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            gap: 10px;
+        }
+        .digit {
+            width: 50px;
+            height: 50px;
+            background: #222;
+            color: #fff;
+            font-size: 20px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        #passwordDisplay {
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        .audio-controls {
+            text-align: center;
+        }
+        .audio-controls button {
+            margin: 10px;
+            padding: 10px 20px;
+            background: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .audio-controls button:hover {
+            background: #666;
+        }
+        .spinner {
+            border: 4px solid #444;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lock Screen -->
+    <div id="lockScreen" class="active">
+        <div class="lock">
+            <div id="passwordDisplay">****</div>
+            <div class="digits">
+                <div class="digit" data-number="1">1</div>
+                <div class="digit" data-number="2">2</div>
+                <div class="digit" data-number="3">3</div>
+                <div class="digit" data-number="4">4</div>
+                <div class="digit" data-number="5">5</div>
+                <div class="digit" data-number="6">6</div>
+                <div class="digit" data-number="7">7</div>
+                <div class="digit" data-number="8">8</div>
+                <div class="digit" data-number="9">9</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Page -->
+    <div id="audioPage">
+        <div class="audio-controls">
+            <div class="spinner"></div>
+            <audio id="audioPlayer" src="" controls></audio>
+            <button id="deleteAudio">Delete Audio</button>
+            <button id="addAudio">Add New Audio</button>
+        </div>
+    </div>
+
+    <script>
+        const lockScreen = document.getElementById('lockScreen');
+        const audioPage = document.getElementById('audioPage');
+        const passwordDisplay = document.getElementById('passwordDisplay');
+        const digits = document.querySelectorAll('.digit');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const deleteAudio = document.getElementById('deleteAudio');
+        const addAudio = document.getElementById('addAudio');
+
+        const visitorPassword = '1234'; // ভিজিটর পাসওয়ার্ড
+        const adminPassword = '4321';  // এডমিন পাসওয়ার্ড
+        let enteredPassword = '';
+
+        digits.forEach(digit => {
+            digit.addEventListener('click', () => {
+                if (enteredPassword.length < 4) {
+                    enteredPassword += digit.dataset.number;
+                    passwordDisplay.textContent = '*'.repeat(enteredPassword.length);
+                }
+                if (enteredPassword.length === 4) {
+                    if (enteredPassword === visitorPassword) {
+                        alert('Visitor Access Granted');
+                        lockScreen.classList.remove('active');
+                        audioPage.classList.add('active');
+                        audioPlayer.src = 'your-audio-file.mp3'; // অডিও ফাইলের লিঙ্ক
+                        deleteAudio.style.display = 'none';
+                        addAudio.style.display = 'none';
+                    } else if (enteredPassword === adminPassword) {
+                        alert('Admin Access Granted');
+                        lockScreen.classList.remove('active');
+                        audioPage.classList.add('active');
+                        audioPlayer.src = 'your-audio-file.mp3';
+                    } else {
+                        alert('Incorrect Password');
+                        enteredPassword = '';
+                        passwordDisplay.textContent = '****';
+                    }
+                }
+            });
+        });
+
+        deleteAudio.addEventListener('click', () => {
+            audioPlayer.src = '';
+            alert('Audio Deleted');
+        });
+
+        addAudio.addEventListener('click', () => {
+            const newAudio = prompt('Enter new audio file URL:');
+            if (newAudio) {
+                audioPlayer.src = newAudio;
+                alert('New Audio Added');
+            }
+        });
+    </script>
+
+</body></html>
