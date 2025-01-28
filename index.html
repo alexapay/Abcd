@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Note for Otoshi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #1d1d1d;
+      color: #fff;
+    }
+    .container {
+      text-align: center;
+      background: #222;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      width: 400px;
+    }
+    #passwordInput {
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      margin: 20px 0;
+    }
+    #audio-container {
+      display: none;
+      margin-top: 20px;
+    }
+    audio {
+      border: 2px solid #4CAF50;
+      border-radius: 10px;
+      padding: 5px;
+      background-color: #333;
+    }
+    #change-section {
+      display: none;
+      margin-top: 20px;
+    }
+    button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    h2, h3 {
+      color: #fff;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* Style for File Input */
+    #audio-upload {
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #audio-upload::-webkit-file-upload-button {
+      background: #333;
+      color: #fff;
+    }
+
+    /* Change Button Styling */
+    .button-black {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #4CAF50;
+    }
+
+    .button-black:hover {
+      background-color: #333;
+    }
+
+    /* Hide File Input Details */
+    #file-details {
+      display: none;
+    }
+
+    /* Show file details only in change section */
+    #audio-container .hidden {
+      display: block;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Password Input Section -->
+    <div id="password-section">
+      <h2>Enter Password</h2>
+      <input type="password" id="passwordInput" maxlength="4" placeholder="4-digit password">
+      <p id="error-message" class="error"></p>
+    </div>
+
+    <!-- Audio Player Section -->
+    <div id="audio-container">
+      <h3>Voice Note for Otoshi</h3>
+      <audio id="audio" controls autoplay>
+        <source id="audio-source" src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      <br>
+      <button id="change-button" class="button-black">Change</button>
+    </div>
+
+    <!-- Change Page Section -->
+    <div id="change-section">
+      <h2>Change Settings</h2>
+      <label for="audio-upload" class="button-black">Choose Audio</label>
+      <input type="file" id="audio-upload" accept="audio/*" class="hidden">
+      <div id="file-details" class="hidden">
+        <span id="file-name">No file chosen</span>
+      </div>
+      <button id="delete-audio" class="button-black">Delete Audio</button>
+      <button id="add-audio" class="button-black">Add New Audio</button>
+      <br>
+      <button id="change-visitor-password" class="button-black">Change Visitors Password</button>
+      <button id="change-admin-password" class="button-black">Change Admin Password</button>
+    </div>
+  </div>
+
+  <script>
+    // Initial Passwords
+    let visitorPassword = "1234";
+    let adminPassword = "5678";
+
+    // Elements
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordSection = document.getElementById("password-section");
+    const audioContainer = document.getElementById("audio-container");
+    const changeButton = document.getElementById("change-button");
+    const changeSection = document.getElementById("change-section");
+    const audioElement = document.getElementById("audio");
+    const audioSource = document.getElementById("audio-source");
+    const fileName = document.getElementById("file-name");
+    const errorMessage = document.getElementById("error-message");
+
+    // Password Check Logic
+    passwordInput.addEventListener("input", () => {
+      if (passwordInput.value === visitorPassword) {
+        passwordSection.style.display = "none";
+        audioContainer.style.display = "block";
+        errorMessage.textContent = "";
+      } else if (passwordInput.value === adminPassword) {
+        passwordSection.style.display = "none";
+        changeSection.style.display = "block";
+        errorMessage.textContent = "";
+      } else if (passwordInput.value.length === 4) {
+        errorMessage.textContent = "Incorrect password!";
+      }
+    });
+
+    // Audio Controls
+    audioElement.addEventListener("play", () => {
+      audioElement.controls = false;
+    });
+
+    // Change Button Logic (Protected with Admin Password)
+    changeButton.addEventListener("click", () => {
+      const changePassword = prompt("Enter admin password to access change options:");
+      if (changePassword === adminPassword) {
+        passwordSection.style.display = "none";
+        audioContainer.style.display = "none";
+        changeSection.style.display = "block";
+      } else {
+        alert("Incorrect admin password!");
+      }
+    });
+
+    // Delete Audio Logic
+    document.getElementById("delete-audio").addEventListener("click", () => {
+      audioElement.src = "";
+      alert("Audio deleted successfully!");
+    });
+
+    // Add New Audio Logic (Upload File)
+    audioUpload.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const objectURL = URL.createObjectURL(file);
+        audioSource.src = objectURL;
+        audioElement.load(); // Refresh audio element
+        audioElement.play(); // Auto-play the uploaded audio
+        fileName.textContent = file.name;
+        document.getElementById("file-details").style.display = "block";
+        alert("New audio uploaded successfully!");
+      }
+    });
+
+    // Change Visitors Password Logic
+    document.getElementById("change-visitor-password").addEventListener("click", () => {
+      const newVisitorPassword = prompt("Enter new 4-digit visitor password:");
+      if (newVisitorPassword && newVisitorPassword.length === 4) {
+        visitorPassword = newVisitorPassword;
+        alert("Visitor password changed successfully!");
+      } else {
+        alert("Invalid password. Please try again.");
+      }
+    });
+
+    // Change Admin Password Logic
+    document.getElementById("change-admin-password").addEventListener("click", () => {
+      const newAdminPassword = prompt("Enter new admin password:");
+      if (newAdminPassword) {
+        adminPassword = newAdminPassword;
+        alert("Admin password changed successfully!");
+      } else {
+        alert("Invalid password. Please try again.");
+      }
+    });
+  </script>
+
+</body></html>
